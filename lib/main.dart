@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'features/reader/presentation/pages/home_page.dart';
+import 'models/notes_model.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
+
+  Hive.registerAdapter(NoteModelAdapter());
+
+  await Hive.openBox<NoteModel>('notesBox');
 
   runApp(const QuranMemorizationApp());
 }
