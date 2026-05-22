@@ -20,6 +20,7 @@ class NotesSlider extends StatefulWidget {
 
 class _NotesSliderState
     extends State<NotesSlider> {
+  bool isViewingTestNotes = false;
   late final TextEditingController notesController;
   @override
   void initState() {
@@ -34,7 +35,7 @@ class _NotesSliderState
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.pageNumber != widget.pageNumber ||
-        oldWidget.isTestMode != widget.isTestMode) {
+        oldWidget.isTestMode != isViewingTestNotes) {
 
       loadNotes();
     }
@@ -50,7 +51,7 @@ class _NotesSliderState
 
     if (note != null) {
 
-      if (widget.isTestMode) {
+      if (isViewingTestNotes) {
 
         notesController.text =
             note.testModeNotes;
@@ -79,7 +80,7 @@ class _NotesSliderState
       pageNumber: widget.pageNumber,
     );
 
-    if (widget.isTestMode) {
+    if (isViewingTestNotes) {
 
       note.testModeNotes =
           notesController.text;
@@ -103,61 +104,146 @@ class _NotesSliderState
   Widget build(BuildContext context) {
 
     return Container(
-      width: 300,
-      color: Colors.white,
+      width: 320,
 
-      child: Column(
-        children: [
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F5EE),
 
-          Padding(
-            padding: const EdgeInsets.all(16),
+        borderRadius: const BorderRadius.horizontal(
+          left: Radius.circular(24),
+        ),
 
-            child: Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
-
-              children: [
-
-                Text(
-                  widget.isTestMode
-                      ? 'Test Notes'
-                      : 'Memorization Notes',
-
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight:
-                    FontWeight.bold,
-                  ),
-                ),
-
-                IconButton(
-                  onPressed: saveNotes,
-
-                  icon: const Icon(Icons.save),
-                ),
-              ],
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
           ),
-          Padding(
+        ],
+      ),
+
+      child: SafeArea(
+        child: Column(
+          children: [
+
+            // HEADER
+            Padding(
               padding: const EdgeInsets.all(16),
 
-              child: TextField(
-                controller: notesController,
+              child: Row(
+                mainAxisAlignment:
+                MainAxisAlignment.spaceBetween,
 
-                expands: false,
-                maxLines: null,
+                children: [
 
-                decoration:
-                const InputDecoration(
-                  border:
-                  OutlineInputBorder(),
+                  Text(
+                    isViewingTestNotes
+                        ? 'Test Notes'
+                        : 'Memorization Notes',
 
-                  hintText:
-                  'Write your notes...',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+
+                  TextButton(
+                    onPressed: saveNotes,
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
+            ),
+
+            // NOTEBOOK TABS
+            Padding(
+              padding:
+              const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+
+              child: Row(
+                children: [
+
+                  ChoiceChip(
+                    label:
+                    const Text('Memorization'),
+
+                    selected:
+                    !isViewingTestNotes,
+
+                    onSelected: (_) {
+
+                      setState(() {
+
+                        isViewingTestNotes =
+                        false;
+
+                        loadNotes();
+
+                      });
+
+                    },
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  ChoiceChip(
+                    label:
+                    const Text('Test Mode'),
+
+                    selected:
+                    isViewingTestNotes,
+
+                    onSelected: (_) {
+
+                      setState(() {
+
+                        isViewingTestNotes =
+                        true;
+
+                        loadNotes();
+
+                      });
+
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // TEXT FIELD
+            Expanded(
+              child: Padding(
+                padding:
+                const EdgeInsets.all(16),
+
+                child: TextField(
+                  controller: notesController,
+
+                  readOnly:
+                  isViewingTestNotes,
+
+                  expands: true,
+                  maxLines: null,
+
+                  textAlignVertical:
+                  TextAlignVertical.top,
+
+                  decoration:
+                  const InputDecoration(
+                    hintText:
+                    'Write your notes...',
+
+                    border:
+                    OutlineInputBorder(),
+                  ),
                 ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
 

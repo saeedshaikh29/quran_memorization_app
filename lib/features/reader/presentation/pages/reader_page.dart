@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import '../../../../core/constants/surah_data.dart';
+import '../../../../models/surah_model.dart';
 import '../../../../widgets/notes_slider.dart';
 // import '../widgets/notes_slider.dart';
 
@@ -18,10 +19,25 @@ class ReaderPage extends StatefulWidget {
 class _ReaderPageState extends State<ReaderPage> {
   late final PageController controller;
   bool isNotesOpen = false;
-
   bool isTestMode = false;
-
+  static const double notesPanelWidth = 300;
   late int currentPage = 1;
+
+  String getCurrentSurahName() {
+
+    SurahModel currentSurah = surahs.first;
+
+    for (final surah in surahs) {
+
+      if (currentPage >= surah.startPage) {
+        currentSurah = surah;
+      } else {
+        break;
+      }
+    }
+
+    return currentSurah.name;
+  }
   @override
   void initState() {
     super.initState();
@@ -39,7 +55,19 @@ class _ReaderPageState extends State<ReaderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
+
+        centerTitle: true,
+
+        title: Text(
+          getCurrentSurahName(),
+
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
       ),
       backgroundColor: Colors.white,
       body: Stack(
@@ -104,75 +132,22 @@ class _ReaderPageState extends State<ReaderPage> {
                     ),
                   ),
                 ),
-                // Positioned(
-                //   right: isNotesOpen ? 300 : 0,
-                //
-                //   top:
-                //   MediaQuery.of(context).size.height *
-                //       0.35,
-                //
-                //   child: GestureDetector(
-                //     onTap: () {
-                //
-                //       setState(() {
-                //
-                //         isNotesOpen = !isNotesOpen;
-                //
-                //       });
-                //
-                //     },
-                //
-                //     child: Container(
-                //       padding:
-                //       const EdgeInsets.symmetric(
-                //         horizontal: 12,
-                //         vertical: 18,
-                //       ),
-                //
-                //       decoration: const BoxDecoration(
-                //         color: Colors.green,
-                //
-                //         borderRadius:
-                //         BorderRadius.horizontal(
-                //           left: Radius.circular(16),
-                //         ),
-                //       ),
-                //
-                //       child: const Icon(
-                //         Icons.menu_book,
-                //         color: Colors.white,
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                // AnimatedPositioned(
-                //   duration:
-                //   const Duration(milliseconds: 250),
-                //
-                //   right: isNotesOpen ? 0 : -300,
-                //
-                //   top: 0,
-                //   bottom: 0,
-                //
-                //   child: NotesSlider(
-                //     pageNumber: currentPage,
-                //     isTestMode: isTestMode,
-                //   ),
-                // ),
+                //learn widget tree fool
               ],
             );
           },
         ),
-          Positioned(
-            right: isNotesOpen ? 300 : 0,
+          AnimatedPositioned(
+            right: isNotesOpen ? 285 : 0,
 
             top:
             MediaQuery.of(context).size.height *
                 0.35,
-
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
             child: GestureDetector(
               onTap: () {
-
+                FocusScope.of(context).unfocus();
                 setState(() {
 
                   isNotesOpen = !isNotesOpen;
@@ -181,34 +156,44 @@ class _ReaderPageState extends State<ReaderPage> {
 
               },
 
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 18,
+              child: Material(
+                elevation: 8,
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(16),
                 ),
 
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-
-                  borderRadius:
-                  BorderRadius.horizontal(
-                    left: Radius.circular(16),
+                child: Container(
+                  padding:
+                  const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 18,
                   ),
-                ),
 
-                child: const Icon(
-                  Icons.menu_book,
-                  color: Colors.white,
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+
+                    borderRadius:
+                    BorderRadius.horizontal(
+                      left: Radius.circular(16),
+                    ),
+                  ),
+
+                  child: const Icon(
+                    Icons.menu_book,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
           ),
           AnimatedPositioned(
+            curve: Curves.easeOut,
             duration:
             const Duration(milliseconds: 250),
 
-            right: isNotesOpen ? 0 : -300,
+            right: isNotesOpen
+                ? 0
+                : -(notesPanelWidth + 20),
 
             top: 0,
             bottom: 0,
